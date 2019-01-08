@@ -136,7 +136,10 @@ android {
     }
 }
 
-dependencies {
+dependencies { 
+    // implementation project(':react-native-google-places')
+    compile project(':react-native-google-places')
+    compile project(':react-native-gesture-handler')
     // compile project(':react-native-maps')
     // compile project(':react-native-gesture-handler')
     compile(project(':react-native-maps')) {
