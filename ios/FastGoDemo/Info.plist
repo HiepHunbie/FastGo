@@ -4,8 +4,6 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>CFBundleDisplayName</key>
 	<string>FastGoDemo</string>
 	<key>CFBundleExecutable</key>

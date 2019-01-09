@@ -37,11 +37,11 @@
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
-		B295795E3D8145F3993E9B30 /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B0B462E58F564388AFB10A05 /* libRNGestureHandler.a */; };
-		DA0598D7ACD94AB5841FE384 /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8C43149BB527404EAA12CF7D /* libAirMaps.a */; };
-		994BA930C1304002A042F517 /* libRNLocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1216FE8F4D5743E59E6DBDD2 /* libRNLocation.a */; };
-		7316FAB77B1C49B3808DADC6 /* libRNGooglePlaces.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7766504CD3804E96A6BAEBC4 /* libRNGooglePlaces.a */; };
-		6AE8975DCC7A4B03B0268A01 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CED18A4F48FF4172A2E5360B /* libReactNativePermissions.a */; };
+		9945B9865EC04713A95DE5FB /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E852E2EDD3E48FDB982FFC7 /* libRNGestureHandler.a */; };
+		1F8F0B1CE8EF4D37B1465EA3 /* libRNGooglePlaces.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 632710FC616D4ED9B9C9D5E6 /* libRNGooglePlaces.a */; };
+		AEDA5353C18342A09F10B93C /* libRNLocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCBE8F26AA2A4F83B9C264ED /* libRNLocation.a */; };
+		FC500E1D233B4F8F88C86311 /* libAirMaps.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FEC808CF58944B519AF1C4E5 /* libAirMaps.a */; };
+		E0FFFCFFD7CB47B0AF4F7694 /* libReactNativePermissions.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 84BCB8CE40A3424086EBF332 /* libReactNativePermissions.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -347,16 +347,16 @@
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
-		5D8DCD4A39564F5294DE55BB /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; name = "RNGestureHandler.xcodeproj"; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		B0B462E58F564388AFB10A05 /* libRNGestureHandler.a */ = {isa = PBXFileReference; name = "libRNGestureHandler.a"; path = "libRNGestureHandler.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		E6C85DEAF9A94038AB05C435 /* AirMaps.xcodeproj */ = {isa = PBXFileReference; name = "AirMaps.xcodeproj"; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		8C43149BB527404EAA12CF7D /* libAirMaps.a */ = {isa = PBXFileReference; name = "libAirMaps.a"; path = "libAirMaps.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		11C30D1E76834C748DBDDF21 /* RNLocation.xcodeproj */ = {isa = PBXFileReference; name = "RNLocation.xcodeproj"; path = "../node_modules/react-native-location/ios/RNLocation.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		1216FE8F4D5743E59E6DBDD2 /* libRNLocation.a */ = {isa = PBXFileReference; name = "libRNLocation.a"; path = "libRNLocation.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		116A6527F5CD4721B29562C7 /* RNGooglePlaces.xcodeproj */ = {isa = PBXFileReference; name = "RNGooglePlaces.xcodeproj"; path = "../node_modules/react-native-google-places/ios/RNGooglePlaces.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		7766504CD3804E96A6BAEBC4 /* libRNGooglePlaces.a */ = {isa = PBXFileReference; name = "libRNGooglePlaces.a"; path = "libRNGooglePlaces.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
-		0BA785F751F3469C900B09A4 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; name = "ReactNativePermissions.xcodeproj"; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
-		CED18A4F48FF4172A2E5360B /* libReactNativePermissions.a */ = {isa = PBXFileReference; name = "libReactNativePermissions.a"; path = "libReactNativePermissions.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		3D197A2D3EE04B4A837526D0 /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; name = "RNGestureHandler.xcodeproj"; path = "../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		0E852E2EDD3E48FDB982FFC7 /* libRNGestureHandler.a */ = {isa = PBXFileReference; name = "libRNGestureHandler.a"; path = "libRNGestureHandler.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		A584A821F1024D899FAE7E81 /* RNGooglePlaces.xcodeproj */ = {isa = PBXFileReference; name = "RNGooglePlaces.xcodeproj"; path = "../node_modules/react-native-google-places/ios/RNGooglePlaces.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		632710FC616D4ED9B9C9D5E6 /* libRNGooglePlaces.a */ = {isa = PBXFileReference; name = "libRNGooglePlaces.a"; path = "libRNGooglePlaces.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		C1D551E7B88D48F3BAA015FE /* RNLocation.xcodeproj */ = {isa = PBXFileReference; name = "RNLocation.xcodeproj"; path = "../node_modules/react-native-location/ios/RNLocation.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		BCBE8F26AA2A4F83B9C264ED /* libRNLocation.a */ = {isa = PBXFileReference; name = "libRNLocation.a"; path = "libRNLocation.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		7DFEF4E54F4D4CC2865C730A /* AirMaps.xcodeproj */ = {isa = PBXFileReference; name = "AirMaps.xcodeproj"; path = "../node_modules/react-native-maps/lib/ios/AirMaps.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		FEC808CF58944B519AF1C4E5 /* libAirMaps.a */ = {isa = PBXFileReference; name = "libAirMaps.a"; path = "libAirMaps.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		EF251B16DC00448B890D0DE5 /* ReactNativePermissions.xcodeproj */ = {isa = PBXFileReference; name = "ReactNativePermissions.xcodeproj"; path = "../node_modules/react-native-permissions/ios/ReactNativePermissions.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		84BCB8CE40A3424086EBF332 /* libReactNativePermissions.a */ = {isa = PBXFileReference; name = "libReactNativePermissions.a"; path = "libReactNativePermissions.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -384,11 +384,11 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				B295795E3D8145F3993E9B30 /* libRNGestureHandler.a in Frameworks */,
-				DA0598D7ACD94AB5841FE384 /* libAirMaps.a in Frameworks */,
-				994BA930C1304002A042F517 /* libRNLocation.a in Frameworks */,
-				7316FAB77B1C49B3808DADC6 /* libRNGooglePlaces.a in Frameworks */,
-				6AE8975DCC7A4B03B0268A01 /* libReactNativePermissions.a in Frameworks */,
+				9945B9865EC04713A95DE5FB /* libRNGestureHandler.a in Frameworks */,
+				1F8F0B1CE8EF4D37B1465EA3 /* libRNGooglePlaces.a in Frameworks */,
+				AEDA5353C18342A09F10B93C /* libRNLocation.a in Frameworks */,
+				FC500E1D233B4F8F88C86311 /* libAirMaps.a in Frameworks */,
+				E0FFFCFFD7CB47B0AF4F7694 /* libReactNativePermissions.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,11 +575,11 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
-				5D8DCD4A39564F5294DE55BB /* RNGestureHandler.xcodeproj */,
-				E6C85DEAF9A94038AB05C435 /* AirMaps.xcodeproj */,
-				11C30D1E76834C748DBDDF21 /* RNLocation.xcodeproj */,
-				116A6527F5CD4721B29562C7 /* RNGooglePlaces.xcodeproj */,
-				0BA785F751F3469C900B09A4 /* ReactNativePermissions.xcodeproj */,
+				3D197A2D3EE04B4A837526D0 /* RNGestureHandler.xcodeproj */,
+				A584A821F1024D899FAE7E81 /* RNGooglePlaces.xcodeproj */,
+				C1D551E7B88D48F3BAA015FE /* RNLocation.xcodeproj */,
+				7DFEF4E54F4D4CC2865C730A /* AirMaps.xcodeproj */,
+				EF251B16DC00448B890D0DE5 /* ReactNativePermissions.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1216,9 +1216,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1250,9 +1250,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1277,9 +1277,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1303,9 +1303,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1345,9 +1345,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1387,9 +1387,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1428,9 +1428,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};
@@ -1469,9 +1469,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-gesture-handler/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
-					"$(SRCROOT)/../node_modules/react-native-location/ios",
 					"$(SRCROOT)/../node_modules/react-native-google-places/ios",
+					"$(SRCROOT)/../node_modules/react-native-location/ios",
+					"$(SRCROOT)/../node_modules/react-native-maps/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-permissions/ios/**",
 				);
 			};

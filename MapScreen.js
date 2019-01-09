@@ -1,48 +1,103 @@
-import { Button, Text, View,StyleSheet, Dimensions,TouchableOpacity, } from 'react-native';
+import { Button, Text, View,StyleSheet, Dimensions,TouchableOpacity,TouchableHighlight, } from 'react-native';
 import React, {Component} from 'react';
-import MapView, { PROVIDER_GOOGLE,Marker } from 'react-native-maps';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-
-const homePlace = { description: 'Home', geometry: { location: { lat: 48.8152937, lng: 2.4597668 } }};
-const workPlace = { description: 'Work', geometry: { location: { lat: 48.8496818, lng: 2.2940881 } }};
-
+import MapView, { PROVIDER_GOOGLE,Marker,Polyline } from 'react-native-maps';
+import Geolocation from 'react-native-geolocation-service';
+import RNGooglePlaces from 'react-native-google-places';
 
 export default class MapScreen extends React.Component {
+  
 
   constructor(props) {
     super(props);
-  
+    this._getCoords = this._getCoords.bind(this);
     this.state = {
-      latitude: 0,
-      longitude: 0,
-      error: null,
+      latitude: 37.78825,
+      longitude: -122.4324,
+      latitudeOutput: 37.78825,
+      longitudeOutput: -122.4324,
+      error: "",
+      timestamp: null,
+      inputAddress:"Điểm bắt đầu",
+      outputAddress:"Điểm kết thúc",
+    };
+    this.stateOutPut = {
+      latitude: 37.78825,
+      longitude: -122.4324,
+      error: "",
       timestamp: null
     };
+
   }
-  
-  componentDidMount() {
-    navigator.geolocation.getCurrentPosition(
+  _getCoords = () => {
+    // navigator.geolocation.getCurrentPosition(
+    //     (position) => {
+    //         var initialPosition = JSON.stringify(position.coords);
+    //         this.setState({position: initialPosition});
+    //         let tempCoords = {
+    //             latitude: Number(position.coords.latitude),
+    //             longitude: Number(position.coords.longitude)
+    //         }
+    //         this._map.animateToCoordinate(tempCoords, 1);
+    //       }, function (error) { alert(error) },
+    //  );
+    Geolocation.getCurrentPosition(
       (position) => {
-        this.setState({ 
-          latitude: position.coords.latitude ,
-          longitute: position.coords.longitude,
-          timestamp:  position.timestamp
-        })
+          console.log(position);
+          this.setState({ 
+            longitude: position.coords.longitude,
+            latitude: position.coords.latitude,
+            timestamp:  position.timestamp,
+          })
+          this._gotoCurrentLocation();
       },
-      (error) => this.setState({ error: error.message }),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    )
+      (error) => {this.setState({ error: error.message })
+          // See error code charts below.
+          console.log(error.code, error.message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  );
+};
+
+  componentDidMount() {
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => {
+    //     this.setState({ 
+    //       latitude: position.coords.latitude ,
+    //       longitute: position.coords.longitude,
+    //       timestamp:  position.timestamp
+    //     })
+    //   },
+    //   (error) => this.setState({ error: error.message }),
+    //   { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+    // )
+    this._getCoords();
+    
   }
   
   // componentWillUnmount() {
   //   navigator.geolocation.clearWatch(this.watchId);
   // }
+  
   render() {
-   console.log('ssssss '+this.state.latitude);
+  //  console.log('ssssss '+this.state.latitude);
     return (
         <View style={{flex:1}}>
+        <View style={{flex:0.15,width:'50%',backgroundColor:'#EE8709',
+        marginLeft:'25%',marginRight:'25%'}}>
+        {/* <TouchableHighlight onPress={() => this.openSearchModalInput()}> */}
+        <Text ref={ref => { this.txtInput = ref; }}
+        style={styles.baseText} onPress={() => this.openSearchModalInput()}>{this.state.inputAddress}</Text>
+        {/* </TouchableHighlight> */}
+        {/* <TouchableHighlight onPress={() => this.openSearchModalOutput()}> */}
+        <Text ref={ref => { this.txtOutput = ref; }}
+        style={styles.baseText} onPress={() => this.openSearchModalOutput()}>{this.state.outputAddress}</Text>
+        {/* </TouchableHighlight> */}
+      </View>
+     
         <MapView
-      style={{flex: 1 }}
+        ref={ref => { this.map = ref; }}
+      style={{flex: 1, alignSelf: 'stretch', }}
+      onRegionChange={this._handleMapRegionChange}
       provider={PROVIDER_GOOGLE}
       showsMyLocationButton={true}
       style={styles.container}
@@ -53,6 +108,17 @@ export default class MapScreen extends React.Component {
       longitudeDelta: 0.0421,
       }
     }
+    onMapReady={() => {
+      if (
+        this.state.moveToUserLocation &&
+        this.props.userLocation.data.coords &&
+        this.props.userLocation.data.coords.latitude
+      ) {
+        this._gotoCurrentLocation();
+        this.state.moveToUserLocation = false;
+      }
+    }}
+    // onRegionChangeComplete={region => {this._gotoCurrentLocation()}}
       >
       <MapView.Marker 
         title={'Hi'}
@@ -65,6 +131,35 @@ export default class MapScreen extends React.Component {
          longitude: this.state.longitude,
          latitudeDelta: 0.0922,
       longitudeDelta: 0.0421 }}/>
+
+      <MapView.Marker 
+        title={'Hi'}
+        style={{
+          width: 20,
+          height: 20
+        }}
+        // image={require('../FastGo/Images/my_location.png')}
+        coordinate={{ latitude: this.state.latitudeOutput,
+         longitude: this.state.longitudeOutput,
+         latitudeDelta: 0.0922,
+      longitudeDelta: 0.0421 }}/>
+
+      <Polyline
+		coordinates={[
+			{ latitude: this.state.latitude, longitude: this.state.longitude },
+			{ latitude: this.state.latitudeOutput, longitude: this.state.longitudeOutput }
+		]}
+		strokeColor="#000" // fallback for when `strokeColors` is not supported by the map-provider
+		strokeColors={[
+			'#7F0000',
+			'#00000000', // no color, creates a "long" gradient between the previous and next coordinate
+			'#B24112',
+			'#E5845C',
+			'#238C23',
+			'#7F0000'
+		]}
+		strokeWidth={6}
+	/>
       </MapView>
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <Text style={styles.baseText}>Loại xe:</Text>
@@ -73,7 +168,7 @@ export default class MapScreen extends React.Component {
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <TouchableOpacity
          style={styles.button}
-         onPress={this.onPress}
+         onPress={() => this.openSearchModalInput()}
        >
          <Text style={{textAlign: 'center',
     fontWeight: 'bold',
@@ -86,11 +181,53 @@ export default class MapScreen extends React.Component {
        
     );
   }
+  _gotoCurrentLocation() {
+    console.log('ssssss '+this.state.latitude);
+    this.map.animateToRegion({
+      latitude: this.state.latitude,
+      longitude: this.state.longitude,
+      latitudeDelta: 0.0059397161733585335,
+      longitudeDelta: 0.005845874547958374
+    });
+  }
+
+  openSearchModalInput() {
+    RNGooglePlaces.openAutocompleteModal()
+    .then((place) => {
+        console.log(place);
+        this.setState({ 
+          longitude: place.longitude,
+          latitude: place.latitude,
+          inputAddress: place.address,
+        })
+        this._gotoCurrentLocation();
+        // place represents user's selection from the
+        // suggestions and it is a simplified Google Place object.
+    })
+    .catch(error => console.log(error.message));  // error is a Javascript Error object
+  }
+  openSearchModalOutput() {
+    RNGooglePlaces.openAutocompleteModal()
+    .then((place) => {
+        console.log(place);
+        this.setState({ 
+          longitudeOutput: place.longitude,
+          latitudeOutput: place.latitude,
+          outputAddress: place.address,
+        })
+        // this._gotoCurrentLocation();
+        // place represents user's selection from the
+        // suggestions and it is a simplified Google Place object.
+    })
+    .catch(error => console.log(error.message));  // error is a Javascript Error object
+  }
 }
+
 onPress = () => {
-  this.setState({
-    count: this.state.count+1
-  })
+  this._gotoCurrentLocation()
+  // this.setState({
+  //   count: this.state.count+1
+  // })
 }
 const styles = StyleSheet.create({
   container: {
@@ -129,5 +266,17 @@ const styles = StyleSheet.create({
 },marker: {
   width: 60,
   height: 75
+},baseText: {
+  fontFamily: 'Cochin',
+    alignItems: 'center',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 0,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 12,
+    padding:5,
+    flex:1,
+    color: 'white',
 },
 });
