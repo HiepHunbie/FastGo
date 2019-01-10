@@ -4,17 +4,21 @@ import MapView, { PROVIDER_GOOGLE,Marker,Polyline } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 
+const GOOGLE_MAPS_APIKEY = 'AIzaSyBqu8npUOIhk8RsyyQq2x_tRAwaEjj1GHE';
+
 export default class MapScreen extends React.Component {
   
-
+  static navigationOptions = {
+    title: 'Maps',
+  };
   constructor(props) {
     super(props);
     this._getCoords = this._getCoords.bind(this);
     this.state = {
       latitude: 37.78825,
       longitude: -122.4324,
-      latitudeOutput: 37.78825,
-      longitudeOutput: -122.4324,
+      latitudeOutput: 0,
+      longitudeOutput: 0,
       error: "",
       timestamp: null,
       inputAddress:"Điểm bắt đầu",
@@ -49,6 +53,14 @@ export default class MapScreen extends React.Component {
             timestamp:  position.timestamp,
           })
           this._gotoCurrentLocation();
+//           fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + this.state.latitude + ',' + this.state.longitude + '&key=' + GOOGLE_MAPS_APIKEY)
+//           .then((response) => response.json())
+//           .then((responseJson) => {
+//             console.log('ADDRESS GEOCODE is BACK!! => ' + JSON.stringify(responseJson));
+//             this.setState({ 
+//               inputAddress: JSON.stringify(responseJson).results[0].address_components.filter(x => x.types.filter(t => t == 'administrative_area_level_1').length > 0)[0].short_name,
+//             })
+// })
       },
       (error) => {this.setState({ error: error.message })
           // See error code charts below.
@@ -85,11 +97,11 @@ export default class MapScreen extends React.Component {
         <View style={{flex:0.15,width:'50%',backgroundColor:'#EE8709',
         marginLeft:'25%',marginRight:'25%'}}>
         {/* <TouchableHighlight onPress={() => this.openSearchModalInput()}> */}
-        <Text ref={ref => { this.txtInput = ref; }}
+        <Text numberOfLines={1} ref={ref => { this.txtInput = ref; }}
         style={styles.baseText} onPress={() => this.openSearchModalInput()}>{this.state.inputAddress}</Text>
         {/* </TouchableHighlight> */}
         {/* <TouchableHighlight onPress={() => this.openSearchModalOutput()}> */}
-        <Text ref={ref => { this.txtOutput = ref; }}
+        <Text numberOfLines={1}  ref={ref => { this.txtOutput = ref; }}
         style={styles.baseText} onPress={() => this.openSearchModalOutput()}>{this.state.outputAddress}</Text>
         {/* </TouchableHighlight> */}
       </View>
@@ -143,7 +155,13 @@ export default class MapScreen extends React.Component {
          longitude: this.state.longitudeOutput,
          latitudeDelta: 0.0922,
       longitudeDelta: 0.0421 }}/>
-
+{/* <MapViewDirections
+    origin={{latitude: this.state.latitude, longitude: this.state.longitude}}
+    destination={{latitude: this.state.latitudeOutput, longitude: this.state.longitudeOutput}}
+    apikey={GOOGLE_MAPS_APIKEY}
+    strokeWidth={3}
+    strokeColor="hotpink"
+  />  */}
       <Polyline
 		coordinates={[
 			{ latitude: this.state.latitude, longitude: this.state.longitude },
@@ -164,6 +182,12 @@ export default class MapScreen extends React.Component {
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <Text style={styles.baseText}>Loại xe:</Text>
       <Text style={styles.baseText}>Giá tiền:</Text>
+      <View style={{flex:0.3}}
+        >
+        <Text style={styles.baseText}
+        onPress={() => this.props.navigation.navigate('Profile')}
+        >HO</Text>
+        </View>
       </View>
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <TouchableOpacity
@@ -201,11 +225,23 @@ export default class MapScreen extends React.Component {
           inputAddress: place.address,
         })
         this._gotoCurrentLocation();
+        
         // place represents user's selection from the
         // suggestions and it is a simplified Google Place object.
     })
     .catch(error => console.log(error.message));  // error is a Javascript Error object
   }
+
+  fitMapFromLocation(){
+    this.map.fitToCoordinates([
+      { latitude: this.state.latitude, longitude: this.state.longitude },
+      { latitude: this.state.latitudeOutput, longitude: this.state.longitudeOutput }
+    ] , {
+      edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
+      animated: true,
+    });
+  }
+
   openSearchModalOutput() {
     RNGooglePlaces.openAutocompleteModal()
     .then((place) => {
@@ -215,9 +251,11 @@ export default class MapScreen extends React.Component {
           latitudeOutput: place.latitude,
           outputAddress: place.address,
         })
+        this.fitMapFromLocation();
         // this._gotoCurrentLocation();
         // place represents user's selection from the
         // suggestions and it is a simplified Google Place object.
+        
     })
     .catch(error => console.log(error.message));  // error is a Javascript Error object
   }
