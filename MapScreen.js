@@ -1,8 +1,9 @@
-import { Button, Text, View,StyleSheet, Dimensions,TouchableOpacity,TouchableHighlight, } from 'react-native';
+import { Button, Text, View,StyleSheet, Dimensions,TouchableOpacity,TouchableHighlight,ActivityIndicator,Alert, } from 'react-native';
 import React, {Component} from 'react';
 import MapView, { PROVIDER_GOOGLE,Marker,Polyline } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
+import Loader from './Loader';
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyBqu8npUOIhk8RsyyQq2x_tRAwaEjj1GHE';
 
@@ -23,6 +24,8 @@ export default class MapScreen extends React.Component {
       timestamp: null,
       inputAddress:"Điểm bắt đầu",
       outputAddress:"Điểm kết thúc",
+      money:'',
+      isLoading: false,
     };
     this.stateOutPut = {
       latitude: 37.78825,
@@ -92,6 +95,21 @@ export default class MapScreen extends React.Component {
   
   render() {
   //  console.log('ssssss '+this.state.latitude);
+  if (this.state.isLoading) {
+    return (
+      <View style={{flex:1, paddingTop: 20,}}>
+        {/* <Text style={styles.titleText}>FASTGO</Text>
+          <Button style={styles.buttons}
+          title="Bắt đầu"
+          onPress={() => this.props.navigation.navigate('Maps')}
+          /> */}
+        {/* <ActivityIndicator /> */}
+        <Loader
+          loading={this.state.loading} />
+      </View>
+      
+    );
+  }
     return (
         <View style={{flex:1}}>
         <View style={{flex:0.15,width:'50%',backgroundColor:'#EE8709',
@@ -180,8 +198,8 @@ export default class MapScreen extends React.Component {
 	/>
       </MapView>
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
-      <Text style={styles.baseText}>Loại xe:</Text>
-      <Text style={styles.baseText}>Giá tiền:</Text>
+      <Text style={styles.baseText}>Loại xe: Xe máy</Text>
+      <Text style={styles.baseText}>{'Giá tiền: ' + this.state.money}</Text>
       <View style={{flex:0.3}}
         >
         <Text style={styles.baseText}
@@ -192,7 +210,7 @@ export default class MapScreen extends React.Component {
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <TouchableOpacity
          style={styles.button}
-         onPress={() => this.openSearchModalInput()}
+         onPress={() => this.showDialogSendTrip()}
        >
          <Text style={{textAlign: 'center',
     fontWeight: 'bold',
@@ -252,12 +270,75 @@ export default class MapScreen extends React.Component {
           outputAddress: place.address,
         })
         this.fitMapFromLocation();
+        this.getDataTrip();
         // this._gotoCurrentLocation();
         // place represents user's selection from the
         // suggestions and it is a simplified Google Place object.
         
     })
     .catch(error => console.log(error.message));  // error is a Javascript Error object
+  }
+
+  getDataTrip(){
+    return fetch('https://reactnativecode.000webhostapp.com/StudentsList.php')
+          .then((response) => response.json())
+          .then((responseJson) => {
+            console.log(responseJson);
+            // let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+            this.setState({
+              isLoading: false,
+              money:responseJson[0].student_phone_number,
+            }, function() {
+              // In this block you can do something with new state.
+            //  this.showDialogResultTrip();
+            });
+            
+          })
+  }
+  getResultDataTrip(){
+    return fetch('https://reactnativecode.000webhostapp.com/StudentsList.php')
+          .then((response) => response.json())
+          .then((responseJson) => {
+            console.log(responseJson);
+            // let ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+            this.setState({
+              isLoading: false,
+              money:responseJson[0].student_phone_number,
+            }, function() {
+              // In this block you can do something with new state.
+             this.showDialogResultTrip();
+            });
+            
+          })
+  }
+  sendDataMyTrip(){
+    this.setState({ 
+      isLoading: true,
+    })
+    this.getResultDataTrip();
+  }
+
+  showDialogSendTrip(){
+    Alert.alert(
+      'Bạn đã sẵn sàng !!!',
+      'Chúng tôi sẽ tìm tài xế cho bạn ???',
+      [
+        {text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+        {text: 'OK', onPress: () => this.sendDataMyTrip()},
+      ],
+      { cancelable: false }
+    )
+  }
+
+  showDialogResultTrip(){
+    Alert.alert(
+      'Xin chào !!!',
+      'Lái xe đang trên đường đón bạn !',
+      [
+        {text: 'OK', onPress: () => console.log('Ok Pressed')},
+      ],
+      { cancelable: false }
+    )
   }
 }
 

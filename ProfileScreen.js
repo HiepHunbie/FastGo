@@ -1,18 +1,24 @@
 import { Button, Text, View,StyleSheet, Dimensions, } from 'react-native';
 import React, {Component} from 'react';
 import { TabView, TabBar, SceneMap } from 'react-native-tab-view';
+import MyProfile from './MyProfile';
+import MyTrips from './MyTrips';
 
 const FirstRoute = () => (
-  <View style={[styles.scene, { backgroundColor: '#ffffff' }]} />
+  <View style={[styles.scene, { backgroundColor: '#ffffff' }]} >
+  <MyProfile/>
+  </View>
 );
 const SecondRoute = () => (
-  <View style={[styles.scene, { backgroundColor: '#ffffff' }]} />
+  <View style={[styles.scene, { backgroundColor: '#ffffff' }]} >
+  <MyTrips/>
+  </View>
 );
 export default class ProfileScreen extends React.Component {
   static navigationOptions = {
     title: 'Profile',
+    headerTitleStyle : {width : Dimensions.get('window').width}
   };
-
   state = {
     index: 0,
     routes: [
