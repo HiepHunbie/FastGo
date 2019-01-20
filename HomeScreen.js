@@ -27,12 +27,36 @@ export async function request_location_runtime_permission() {
   }
 }
 
+export async function request_read_phone_runtime_permission() {
+
+  try {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+      {
+        'title': 'ReactNativeCode Read Phone Permission',
+        'message': 'ReactNativeCode App needs access to your READ_PHONE_STATE '
+      }
+    )
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+
+      Alert.alert("READ_PHONE_STATE Permission Granted.");
+    }
+    else {
+
+      Alert.alert("READ_PHONE_STATE Permission Not Granted");
+
+    }
+  } catch (err) {
+    console.warn(err)
+  }
+}
+
 export default class HomeScreen extends React.Component {
 
   async componentDidMount() {
  
-    await request_location_runtime_permission()
- 
+    await request_location_runtime_permission(),
+    await request_read_phone_runtime_permission()
   }
   
   render() {

@@ -5,7 +5,9 @@ import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import Loader from './Loader';
 
+
 const GOOGLE_MAPS_APIKEY = 'AIzaSyBqu8npUOIhk8RsyyQq2x_tRAwaEjj1GHE';
+let ws;
 
 export default class MapScreen extends React.Component {
   
@@ -26,6 +28,7 @@ export default class MapScreen extends React.Component {
       outputAddress:"Điểm kết thúc",
       money:'',
       isLoading: false,
+      DeviceIMEI: '',
     };
     this.stateOutPut = {
       latitude: 37.78825,
@@ -86,6 +89,9 @@ export default class MapScreen extends React.Component {
     //   { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
     // )
     this._getCoords();
+    this.getDeviceIMEI();
+    this.onGetMessageFromQueue();
+    // ActiveMQ.connect( "topicName", "userid");
     
   }
   
@@ -210,7 +216,7 @@ export default class MapScreen extends React.Component {
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <TouchableOpacity
          style={styles.button}
-         onPress={() => this.showDialogSendTrip()}
+         onPress={() => /*this.showDialogSendTrip()*/ this.onFetchLoginRecords()}
        >
          <Text style={{textAlign: 'center',
     fontWeight: 'bold',
@@ -263,7 +269,7 @@ export default class MapScreen extends React.Component {
   openSearchModalOutput() {
     RNGooglePlaces.openAutocompleteModal()
     .then((place) => {
-        console.log(place);
+        
         this.setState({ 
           longitudeOutput: place.longitude,
           latitudeOutput: place.latitude,
@@ -340,6 +346,199 @@ export default class MapScreen extends React.Component {
       { cancelable: false }
     )
   }
+
+  getDeviceIMEI = () => {
+    const IMEI = require('react-native-imei')
+    console.log("imei : "+IMEI.getImei());
+    this.setState({
+      DeviceIMEI: IMEI.getImei(),
+    })
+  }
+
+  async onFetchLoginRecords() {
+    var data = {
+     "deviceOS": "android",
+	"deviceId": this.state.DeviceIMEI,
+	"deviceType": "driver",
+	"author": "HiepNt"
+    };
+    console.log("data : "+data);
+    try {
+     let response = await fetch(
+      "https://izktg7yj2f.execute-api.ap-southeast-1.amazonaws.com/dev/receive-device-info",
+      {
+        method: "POST",
+        headers: {
+         "Accept": "application/json",
+         "Content-Type": "application/json"
+        },
+       body: JSON.stringify(data)
+     }
+    );
+    console.log("responseMQ : "+JSON.stringify(response));
+     if (response.status >= 200 && response.status < 300) {
+        alert("authenticated successfully!!!");
+        // this._openWebSocket();
+        this.onGetMessageFromQueue();
+     }
+   } catch (errors) {
+
+     alert(errors);
+    } 
+}
+
+async onFetchLogOutRecords() {
+  var data = {
+"deviceId": this.state.DeviceIMEI
+  };
+  try {
+   let response = await fetch(
+    "https://izktg7yj2f.execute-api.ap-southeast-1.amazonaws.com/dev/logout-device",
+    {
+      method: "POST",
+      headers: {
+       "Accept": "application/json",
+       "Content-Type": "application/json"
+      },
+     body: JSON.stringify(data)
+   }
+  );
+   if (response.status >= 200 && response.status < 300) {
+      alert("logout successfully!!!");
+      
+   }
+ } catch (errors) {
+
+   alert(errors);
+  } 
+}
+
+async onGetMessageFromQueue(){
+  var client = Stomp.client( "wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619");
+  client.connect( "activemqd1adm", "abcde12345-@",
+   function() {
+       client.subscribe("jms.topic.test",
+        function( message ) {
+            alert( message );
+           }, 
+     { priority: 9 } 
+       );
+    client.send("jms.topic.test", { priority: 9 }, "Pub/Sub over STOMP!");
+   }
+  );
+}
+
+
+_openWebSocket(){
+  ws = new WebSocket('ws://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61614', 'v10.stomp');
+
+  ws.onopen = () => {
+
+    var frame = "CONNECT\n"
+            + "login: websockets\n";
+            + "passcode: abcde12345-@\n";
+            + "username: activemqd1adm\n";
+            + "\n\n\0";
+    ws.send(frame);
+    // connection opened
+    console.log("I openend the connection without troubles!");
+
+    // First step is to try subscribe to the proper channel
+
+    let payload = {
+      command: 'subscribe',
+      identifier: JSON.stringify({ channel: 'ConversationChannel' }),
+      // data: JSON.stringify({ to: 'user', message: 'hi', action: 'chat' }),
+    }
+
+    let subscribe_command = JSON.stringify(payload)
+    ws.send(subscribe_command); // send a message
+  };
+
+  ws.onmessage = (e) => {
+
+    let data_received = JSON.parse(e.data)
+
+    if (data_received.type !== "ping") {
+      console.log("Data was received: ", data_received);
+
+      if (data_received.message) {
+        let custom_messages = []
+
+        data_received.message.messages_raw.forEach( (single_message) => {
+            // console.log(single_message);
+            custom_messages.push(
+              {
+                _id: single_message.id,
+                text: single_message.body,
+                createdAt: new Date(single_message.created_at),
+                user: {
+                  _id: single_message.user_id,
+                  name: (single_message.user_id === 3 ? 'User Three' : 'User One'),
+                },
+              }
+            )
+
+        });
+
+        this.setState({
+          messages: custom_messages.reverse()
+        });
+      }
+
+    }
+
+    // console.log("A message was received");
+    // // a message was received
+    // console.log(e.data);
+  };
+
+  ws.onerror = (e) => {
+    console.log("There has been an error : ");
+
+    // an error occurred
+    console.log(e.message);
+  };
+
+  ws.onclose = (e) => {
+    // connection closed
+    console.log("I'm closing it");
+
+    console.log(e.code, e.reason);
+  };
+
+}
+
+async onFetchGetDataRecords() {
+  var data = {
+"deviceId": this.state.DeviceIMEI,
+"author":  "TEST_MQ_123456789",
+"deviceReceiveTime": "2018-12-18T08:20:52.837Z",
+"deviceSendTime": "2018-12-18T08:21:52.837Z",
+"data": "cocococococ - Test message",
+"messageId": 77
+
+  };
+  try {
+   let response = await fetch(
+    "https://izktg7yj2f.execute-api.ap-southeast-1.amazonaws.com/dev/receive-message-info",
+    {
+      method: "POST",
+      headers: {
+       "Accept": "application/json",
+       "Content-Type": "application/json"
+      },
+     body: JSON.stringify(data)
+   }
+  );
+   if (response.status >= 200 && response.status < 300) {
+      alert("getdata successfully!!!");
+   }
+ } catch (errors) {
+
+   alert(errors);
+  } 
+}
 }
 
 onPress = () => {

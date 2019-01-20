@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-imei')
     compile project(':react-native-maps')
     // compile project(':react-native-google-places')
     compile(project(':react-native-google-places')){

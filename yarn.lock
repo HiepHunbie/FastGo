@@ -4658,6 +4658,11 @@ react-native-google-places@^2.5.2:
   resolved "https://registry.yarnpkg.com/react-native-google-places/-/react-native-google-places-2.5.2.tgz#62658034519ab0876ffebfdd1fb2f8503847c1cc"
   integrity sha512-utJrVcZCi7LDaBrd1r6axQAfcR9pRE1NPjUr/gO95iPHT+9ktJGPDcoRuJi7HgMlTZ4eOJaFRx0PB1xFE7WF0Q==
 
+react-native-imei@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/react-native-imei/-/react-native-imei-0.1.2.tgz#020dd2405dbedff7d455a687e051401681b8b3e8"
+  integrity sha512-yPE7R9HHVjDNNLc2FppAcaxH4NBir5Tj0NEY4iR+S2bKVIxyEw9qb5yOE4uD89eJ6h3zVjXbfJnV+WeHAht5ow==
+
 react-native-location@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/react-native-location/-/react-native-location-1.0.0.tgz#e2f0b8a278f342682051455dfe6e6ceada839ee5"
