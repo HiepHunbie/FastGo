@@ -3,6 +3,9 @@ package com.fastgodemo;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import dog.craftz.sqlite_2.RNSqlite2Package;
+import com.amazonaws.RNAWSCognitoPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
 import codes.simen.IMEI.IMEI;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.arttitude360.reactnative.rngoogleplaces.RNGooglePlacesPackage;
@@ -11,7 +14,7 @@ import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
-import com.facebook.soloader.SoLoader;
+import com.facebook.soloader.SoLoader; 
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +31,9 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSqlite2Package(),
+            new RNAWSCognitoPackage(),
+            new VectorIconsPackage(),
             new IMEI(),
             new MapsPackage(),
             new RNGooglePlacesPackage(),

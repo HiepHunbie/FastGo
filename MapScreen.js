@@ -4,16 +4,55 @@ import MapView, { PROVIDER_GOOGLE,Marker,Polyline } from 'react-native-maps';
 import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import Loader from './Loader';
-
+import Stomp from 'stompjs';
+import AWS from 'aws-sdk/dist/aws-sdk-react-native'; 
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import MapViewDirections from 'react-native-maps-directions';
+var markerOk = require('./Images/my_location.png');
 
 const GOOGLE_MAPS_APIKEY = 'AIzaSyBqu8npUOIhk8RsyyQq2x_tRAwaEjj1GHE';
 let ws;
+// const AWS = require('aws-sdk/dist/aws-sdk-react-native');
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
+export const REGION = 'eu-central-1'
+export const BUCKET_NAME = "bucketname"
+
+// AWS.config.update({region: REGION});
+// AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+//   IdentityPoolId: 'eu-central-1:xxxxx',
+// });
+
+// AWS.config.loadFromPath('./config.json');
+// var creds = new AWS.FileSystemCredentials('./config.json');
+// var creds = new AWS.Credentials('AKIAIFZEBYA4L5LY2XUA', 'YbEXbxLpZZVKY/aLUkfp4AKdTfkyfAQiNC835ShN', 'us-east-1');
+// { "accessKeyId": "AKIAIFZEBYA4L5LY2XUA", "secretAccessKey": "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", "region": "us-east-1" }
+if (!AWS.config.region) {
+  AWS.config.update({
+    region: 'eu-west-1',
+    accessKeyId:'AKIAJY5DCV3CGV6JWSPQ',
+    secretAccessKey:'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'
+  });
+}
+
+var radio_props = [
+  {label: 'Draw', value: 0 },
+  {label: 'Erase', value: 1 }
+];
+
 
 export default class MapScreen extends React.Component {
   
-  static navigationOptions = {
+  static navigastionOptions = {
     title: 'Maps',
+    headerTitleStyle : {width : Dimensions.get('window').width}
   };
+  
+
   constructor(props) {
     super(props);
     this._getCoords = this._getCoords.bind(this);
@@ -29,6 +68,10 @@ export default class MapScreen extends React.Component {
       money:'',
       isLoading: false,
       DeviceIMEI: '',
+      value: 0,
+      widthDraw:0,
+      markers:[],
+
     };
     this.stateOutPut = {
       latitude: 37.78825,
@@ -37,19 +80,22 @@ export default class MapScreen extends React.Component {
       timestamp: null
     };
 
+    this.handlePress = this.handlePress.bind(this);
+
+  }
+
+  handlePress(e) {
+    this.setState({
+      markers: [
+        ...this.state.markers,
+        {
+          coordinate: e.nativeEvent.coordinate,
+          cost: `$${getRandomInt(50, 300)}`
+        }
+      ]
+    })
   }
   _getCoords = () => {
-    // navigator.geolocation.getCurrentPosition(
-    //     (position) => {
-    //         var initialPosition = JSON.stringify(position.coords);
-    //         this.setState({position: initialPosition});
-    //         let tempCoords = {
-    //             latitude: Number(position.coords.latitude),
-    //             longitude: Number(position.coords.longitude)
-    //         }
-    //         this._map.animateToCoordinate(tempCoords, 1);
-    //       }, function (error) { alert(error) },
-    //  );
     Geolocation.getCurrentPosition(
       (position) => {
           console.log(position);
@@ -77,22 +123,13 @@ export default class MapScreen extends React.Component {
 };
 
   componentDidMount() {
-    // navigator.geolocation.getCurrentPosition(
-    //   (position) => {
-    //     this.setState({ 
-    //       latitude: position.coords.latitude ,
-    //       longitute: position.coords.longitude,
-    //       timestamp:  position.timestamp
-    //     })
-    //   },
-    //   (error) => this.setState({ error: error.message }),
-    //   { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
-    // )
     this._getCoords();
     this.getDeviceIMEI();
-    this.onGetMessageFromQueue();
+    // this.timer = setInterval(()=> this.getListCarAround(), 5000);
+    // this.onGetMessageFromQueue();
+    // this._openWebSocket();
     // ActiveMQ.connect( "topicName", "userid");
-    
+    // this.onPostRecordKinesis();
   }
   
   // componentWillUnmount() {
@@ -144,6 +181,7 @@ export default class MapScreen extends React.Component {
       longitudeDelta: 0.0421,
       }
     }
+    onPress={this.handlePress}
     onMapReady={() => {
       if (
         this.state.moveToUserLocation &&
@@ -162,7 +200,11 @@ export default class MapScreen extends React.Component {
           width: 20,
           height: 20
         }}
-        // image={require('../FastGo/Images/my_location.png')}
+        // icon={{
+        //   url: markerOk
+        // }}
+        
+        // image={require('./android/app/src/main/assets/img/my_location.png')}
         coordinate={{ latitude: this.state.latitude,
          longitude: this.state.longitude,
          latitudeDelta: 0.0922,
@@ -174,6 +216,9 @@ export default class MapScreen extends React.Component {
           width: 20,
           height: 20
         }}
+        icon={{
+          url: require('./android/app/src/main/assets/img/my_location.png')
+          }}
         // image={require('../FastGo/Images/my_location.png')}
         coordinate={{ latitude: this.state.latitudeOutput,
          longitude: this.state.longitudeOutput,
@@ -200,8 +245,23 @@ export default class MapScreen extends React.Component {
 			'#238C23',
 			'#7F0000'
 		]}
-		strokeWidth={6}
+		strokeWidth={this.state.widthDraw}
 	/>
+  {/* <MapViewDirections
+    origin={{ latitude: this.state.latitude, longitude: this.state.longitude }}
+    destination={{ latitude: this.state.latitudeOutput, longitude: this.state.longitudeOutput }}
+    apikey={GOOGLE_MAPS_APIKEY}
+  /> */}
+
+{this.state.markers.map((marker) => {
+        return (
+          <Marker {...marker} >
+            <View style={styles.marker}>
+              <Text style={styles.text}>{marker.cost}</Text>
+            </View>
+          </Marker>
+        )
+      })}
       </MapView>
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <Text style={styles.baseText}>Loại xe: Xe máy</Text>
@@ -211,6 +271,24 @@ export default class MapScreen extends React.Component {
         <Text style={styles.baseText}
         onPress={() => this.props.navigation.navigate('Profile')}
         >HO</Text>
+        </View>
+      </View>
+      <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
+      
+      <View style={{flex:1}}
+        >
+        <Text style={styles.baseText}
+        onPress={() => this.props.navigation.navigate('Profile')}
+        >Clear All</Text>
+        </View>
+        <View style={{flex:1}}
+        >
+        <RadioForm
+        formHorizontal={true}
+          radio_props={radio_props}
+          initial={0}
+          onPress={(value) => {this.setState({value:value})}}
+        />
         </View>
       </View>
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
@@ -242,14 +320,18 @@ export default class MapScreen extends React.Component {
   openSearchModalInput() {
     RNGooglePlaces.openAutocompleteModal()
     .then((place) => {
-        console.log(place);
+        
         this.setState({ 
           longitude: place.longitude,
           latitude: place.latitude,
           inputAddress: place.address,
         })
-        this._gotoCurrentLocation();
-        
+        console.log("aa : "+this.state.latitudeOutput.toString.length);
+        if(this.state.latitudeOutput != 0){
+          this.fitMapFromLocation();
+        }else{
+          this._gotoCurrentLocation();
+        }
         // place represents user's selection from the
         // suggestions and it is a simplified Google Place object.
     })
@@ -264,6 +346,10 @@ export default class MapScreen extends React.Component {
       edgePadding: { top: 100, right: 100, bottom: 100, left: 100 },
       animated: true,
     });
+    this.setState({ 
+      widthDraw: 6
+    })
+    
   }
 
   openSearchModalOutput() {
@@ -274,7 +360,14 @@ export default class MapScreen extends React.Component {
           longitudeOutput: place.longitude,
           latitudeOutput: place.latitude,
           outputAddress: place.address,
+          marker:[
+            ...this.state.marker,
+            {
+              coordinate : {latitude: this.state.latitude, longitude: this.state.longitude }
+            }
+          ]
         })
+        // console.log("aa : "+this.state.latitudeOutput);
         this.fitMapFromLocation();
         this.getDataTrip();
         // this._gotoCurrentLocation();
@@ -377,9 +470,10 @@ export default class MapScreen extends React.Component {
     );
     console.log("responseMQ : "+JSON.stringify(response));
      if (response.status >= 200 && response.status < 300) {
-        alert("authenticated successfully!!!");
+        // alert("authenticated successfully!!!");
         // this._openWebSocket();
         this.onGetMessageFromQueue();
+        // this._handleWebSocketSetup();
      }
    } catch (errors) {
 
@@ -414,30 +508,64 @@ async onFetchLogOutRecords() {
 }
 
 async onGetMessageFromQueue(){
-  var client = Stomp.client( "wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619");
-  client.connect( "activemqd1adm", "abcde12345-@",
-   function() {
-       client.subscribe("jms.topic.test",
-        function( message ) {
-            alert( message );
-           }, 
-     { priority: 9 } 
-       );
-    client.send("jms.topic.test", { priority: 9 }, "Pub/Sub over STOMP!");
-   }
-  );
+  // var client = Stomp.client( "wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619");
+  // client.connect( "activemqd1adm", "abcde12345-@",
+  //  function() {
+  //      client.subscribe("jms.topic.test",
+  //       function( message ) {
+          
+  //           alert( message );
+  //          }, 
+  //    { priority: 9 } 
+  //      );
+  //   client.send("jms.topic.test", { priority: 9 }, "Pub/Sub over STOMP!");
+  //  }
+  // );
+  // const SockJS = require('wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619');
+  // const socket = new SockJS("wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619");
+  // let client = Stomp.over(socket);
+  // const options = { debug: true, protocols: webstomp.VERSIONS.supportedProtocols() }
+  var client = Stomp.client("wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619");
+	client.connect( "activemqd1adm", "abcde12345-@",
+	function() {
+		client.subscribe(123456789,
+			function( message ) {
+				console.log( "ALO : "+message );
+			}, 
+			{
+				priority: 9 } 
+			);
+			//client.send("jms.topic.test", { priority: 9 }, "Pub/Sub over STOMP!");
+		}
+	);
+  // client.heartbeat.outgoing = 0;
+  // client.heartbeat.incoming = 20000;
 }
 
+_handleWebSocketSetup = () => {
+  const ws = new WebSocket('wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619', 'v10.stomp')
+  ws.onopen = () => {
+    this.props.onOpen && this.props.onOpen()
+    console.log("I openend the connection !");
+  }
+  ws.onmessage = (event) => {
+     this.props.onMessage && this.props.onMessage(event) 
+     let data_received = JSON.parse(e.data)
+    console.log("Data was received: ", data_received);}
+  ws.onerror = (error) => { this.props.onError && this.props.onError(error) }
+  ws.onclose = () => this.reconnect ? this._handleWebSocketSetup() : (this.props.onClose && this.props.onClose())
+  this.setState({ws})
+}
 
 _openWebSocket(){
-  ws = new WebSocket('ws://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61614', 'v10.stomp');
+  const ws = new WebSocket('wss://b-7e13e372-33b1-41cc-9c08-419bda9459a8-1.mq.ap-southeast-1.amazonaws.com:61619', 'v10.stomp');
 
   ws.onopen = () => {
 
     var frame = "CONNECT\n"
-            + "login: websockets\n";
+            + "login: activemqd1adm\n";
             + "passcode: abcde12345-@\n";
-            + "username: activemqd1adm\n";
+            + "nickname: hiepnt\n";
             + "\n\n\0";
     ws.send(frame);
     // connection opened
@@ -450,7 +578,7 @@ _openWebSocket(){
       identifier: JSON.stringify({ channel: 'ConversationChannel' }),
       // data: JSON.stringify({ to: 'user', message: 'hi', action: 'chat' }),
     }
-
+    console.log("payload was received: ", payload);
     let subscribe_command = JSON.stringify(payload)
     ws.send(subscribe_command); // send a message
   };
@@ -458,9 +586,9 @@ _openWebSocket(){
   ws.onmessage = (e) => {
 
     let data_received = JSON.parse(e.data)
-
+    console.log("Data was received: ", data_received);
     if (data_received.type !== "ping") {
-      console.log("Data was received: ", data_received);
+     
 
       if (data_received.message) {
         let custom_messages = []
@@ -539,6 +667,36 @@ async onFetchGetDataRecords() {
    alert(errors);
   } 
 }
+
+async onPostRecordKinesis(){
+  var kinesis = new AWS.Kinesis();
+  kinesis.putRecord({
+  Data: '{"last_updated": "1547884361950","device_id": "123456","device_type": "ios","user_type": "driver","latitude": "1232134","longitude": "4125436","fastgo_id": "99"}',
+  PartitionKey: 'user-123',
+  StreamName: 'fcb_user_location_stream'
+}, function(err, data) {
+  if (err) {
+    console.log("KIS : "+err, err.stack); // an error occurred
+  } else {
+    console.log("KIS2 : "+data); // successful response
+  }
+});
+}
+
+async getListCarAround(){
+
+  fetch('https://facebook.github.io/react-native/movies.json', {method: "GET"})
+   .then((response) => response.json())
+   .then((responseData) =>
+   {
+     //set your data here
+      console.log(responseData);
+   })
+   .catch((error) => {
+       console.error(error);
+   });
+ 
+ }
 }
 
 onPress = () => {
@@ -581,9 +739,6 @@ const styles = StyleSheet.create({
   fontWeight: 'bold',
   fontSize: 18,
   color: 'white',
-},marker: {
-  width: 60,
-  height: 75
 },baseText: {
   fontFamily: 'Cochin',
     alignItems: 'center',
@@ -596,5 +751,9 @@ const styles = StyleSheet.create({
     padding:5,
     flex:1,
     color: 'white',
+},marker:{
+    backgroundColor:"#550bbc",
+    padding:5,
+    borderRadius:5,
 },
 });

@@ -148,6 +148,9 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-sqlite-2')
+    compile project(':amazon-cognito-identity-js')
+    compile project(':react-native-vector-icons')
     compile project(':react-native-imei')
     compile project(':react-native-maps')
     // compile project(':react-native-google-places')
