@@ -5,7 +5,7 @@ import Geolocation from 'react-native-geolocation-service';
 import RNGooglePlaces from 'react-native-google-places';
 import Loader from './Loader';
 import Stomp from 'stompjs';
-import AWS from 'aws-sdk/dist/aws-sdk-react-native'; 
+// import AWS from 'aws-sdk/dist/aws-sdk-react-native'; 
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import MapViewDirections from 'react-native-maps-directions';
 var markerOk = require('./Images/my_location.png');
@@ -31,13 +31,13 @@ export const BUCKET_NAME = "bucketname"
 // var creds = new AWS.FileSystemCredentials('./config.json');
 // var creds = new AWS.Credentials('AKIAIFZEBYA4L5LY2XUA', 'YbEXbxLpZZVKY/aLUkfp4AKdTfkyfAQiNC835ShN', 'us-east-1');
 // { "accessKeyId": "AKIAIFZEBYA4L5LY2XUA", "secretAccessKey": "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", "region": "us-east-1" }
-if (!AWS.config.region) {
-  AWS.config.update({
-    region: 'eu-west-1',
-    accessKeyId:'AKIAJY5DCV3CGV6JWSPQ',
-    secretAccessKey:'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'
-  });
-}
+// if (!AWS.config.region) {
+//   AWS.config.update({
+//     region: 'eu-west-1',
+//     accessKeyId:'AKIAJY5DCV3CGV6JWSPQ',
+//     secretAccessKey:'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'
+//   });
+// }
 
 var radio_props = [
   {label: 'Draw', value: 0 },
@@ -71,6 +71,13 @@ export default class MapScreen extends React.Component {
       value: 0,
       widthDraw:0,
       markers:[],
+      listCarAroundResponse:{},
+      geocodes:[],
+      dataBike:{},
+      latnortheast:0,
+      longnortheast:0,
+      latsouthwest:0,
+      longsouthwest:0,
 
     };
     this.stateOutPut = {
@@ -84,16 +91,37 @@ export default class MapScreen extends React.Component {
 
   }
 
+  
+  
   handlePress(e) {
-    this.setState({
-      markers: [
-        ...this.state.markers,
-        {
-          coordinate: e.nativeEvent.coordinate,
-          cost: `$${getRandomInt(50, 300)}`
+    console.log(e.nativeEvent.coordinate);
+    if(this.state.value==0){
+      this.setState({
+        geocodes: [
+          ...this.state.geocodes,
+          {
+            coordinate: e.nativeEvent.coordinate,
+            cost: `$${getRandomInt(50, 300)}`,
+            lat1: (Math.floor(e.nativeEvent.coordinate.latitude/0.005)+1)*0.005,
+            long1: (Math.floor(e.nativeEvent.coordinate.longitude/0.005)+1)*0.005,
+            lat2: Math.floor(e.nativeEvent.coordinate.latitude/0.005)*0.005,
+            long2:Math.floor(e.nativeEvent.coordinate.longitude/0.005)*0.005,
+            lat:e.nativeEvent.coordinate.latitude,
+            long:e.nativeEvent.coordinate.longitude,
+          }
+        ]
+      })
+    }else{
+      
+      for( var i = 0; i < this.state.geocodes.length-1; i++){ 
+        
+        if (( this.state.geocodes[i].lat === e.nativeEvent.coordinate.latitude)
+        && ( this.state.geocodes[i].long === e.nativeEvent.coordinate.longitude)){
+          this.state.geocodes.splice(i, 1); 
         }
-      ]
-    })
+     }
+    }
+    
   }
   _getCoords = () => {
     Geolocation.getCurrentPosition(
@@ -113,6 +141,7 @@ export default class MapScreen extends React.Component {
 //               inputAddress: JSON.stringify(responseJson).results[0].address_components.filter(x => x.types.filter(t => t == 'administrative_area_level_1').length > 0)[0].short_name,
 //             })
 // })
+// this.onFetchGetDataBikeAround();
       },
       (error) => {this.setState({ error: error.message })
           // See error code charts below.
@@ -125,7 +154,8 @@ export default class MapScreen extends React.Component {
   componentDidMount() {
     this._getCoords();
     this.getDeviceIMEI();
-    // this.timer = setInterval(()=> this.getListCarAround(), 5000);
+    this.timer = setInterval(()=> this.onFetchGetDataBikeAround(), 5000);
+    
     // this.onGetMessageFromQueue();
     // this._openWebSocket();
     // ActiveMQ.connect( "topicName", "userid");
@@ -192,6 +222,24 @@ export default class MapScreen extends React.Component {
         this.state.moveToUserLocation = false;
       }
     }}
+    onRegionChangeComplete={(center) => {
+      this.setState({
+        latnortheast:center.latitude + center.latitudeDelta / 2,
+        longnortheast:center.longitude + center.longitudeDelta / 2,
+        latsouthwest:center.latitude - center.latitudeDelta / 2,
+        longsouthwest:center.longitude - center.longitudeDelta / 2,
+      })
+      // let northeast = {
+      //     latitude: center.latitude + center.latitudeDelta / 2,
+      //     longitude: center.longitude + center.longitudeDelta / 2,
+      //   }
+      //   , southwest = {
+      //     latitude: center.latitude - center.latitudeDelta / 2,
+      //     longitude: center.longitude - center.longitudeDelta / 2,
+      //   };
+    
+      // console.log("ALO ::: "+center, northeast, southwest);
+    }} 
     // onRegionChangeComplete={region => {this._gotoCurrentLocation()}}
       >
       <MapView.Marker 
@@ -257,8 +305,20 @@ export default class MapScreen extends React.Component {
         return (
           <Marker {...marker} >
             <View style={styles.marker}>
-              <Text style={styles.text}>{marker.cost}</Text>
+              <Text style={styles.baseText}></Text>
             </View>
+          </Marker>
+        )
+      })}
+
+{this.state.geocodes.map((marker) => {
+        return (
+          <Marker {...marker} >
+            <View style={styles.geocode}>
+              <Text style={styles.baseTextMarker}>{marker.lat1} + {marker.long1}</Text>
+              <Text style={styles.baseTextMarker}>{marker.lat2} + {marker.long2}</Text>
+            </View>
+            
           </Marker>
         )
       })}
@@ -278,7 +338,7 @@ export default class MapScreen extends React.Component {
       <View style={{flex:1}}
         >
         <Text style={styles.baseText}
-        onPress={() => this.props.navigation.navigate('Profile')}
+        onPress={() => this._clearAllGeoCodes()}
         >Clear All</Text>
         </View>
         <View style={{flex:1}}
@@ -294,7 +354,7 @@ export default class MapScreen extends React.Component {
       <View style={{flex:0.07,width:'100%',backgroundColor:'#EE8709',flexDirection:'row'}}>
       <TouchableOpacity
          style={styles.button}
-         onPress={() => /*this.showDialogSendTrip()*/ this.onFetchLoginRecords()}
+         onPress={() => this.showDialogSendTrip()}
        >
          <Text style={{textAlign: 'center',
     fontWeight: 'bold',
@@ -306,6 +366,12 @@ export default class MapScreen extends React.Component {
       </View>
        
     );
+  }
+
+  _clearAllGeoCodes(){
+    this.setState({
+      geocodes:[],
+    })
   }
   _gotoCurrentLocation() {
     console.log('ssssss '+this.state.latitude);
@@ -332,6 +398,7 @@ export default class MapScreen extends React.Component {
         }else{
           this._gotoCurrentLocation();
         }
+        // this.onFetchGetDataBikeAround();
         // place represents user's selection from the
         // suggestions and it is a simplified Google Place object.
     })
@@ -360,12 +427,12 @@ export default class MapScreen extends React.Component {
           longitudeOutput: place.longitude,
           latitudeOutput: place.latitude,
           outputAddress: place.address,
-          marker:[
-            ...this.state.marker,
-            {
-              coordinate : {latitude: this.state.latitude, longitude: this.state.longitude }
-            }
-          ]
+          // marker:[
+          //   ...this.state.marker,
+          //   {
+          //     coordinate : {latitude: this.state.latitude, longitude: this.state.longitude }
+          //   }
+          // ]
         })
         // console.log("aa : "+this.state.latitudeOutput);
         this.fitMapFromLocation();
@@ -668,6 +735,69 @@ async onFetchGetDataRecords() {
   } 
 }
 
+async onFetchGetDataBikeAround() {
+  // var data = {
+  //   "latitudeStart": "20.9949425",
+  //   "longitudeStart": "105.8619501",
+  //   "latitudeEnd": "20.9949425",
+  //   "longitudeEnd": "105.8619501"
+  // };
+
+  var data = {
+    "latitudeStart": this.state.latnortheast,
+    "longitudeStart": this.state.longnortheast,
+    "latitudeEnd": this.state.latsouthwest,
+    "longitudeEnd": this.state.longsouthwest
+  };
+  try {
+   let response = await fetch(
+    "https://ep5m37egj0.execute-api.ap-southeast-1.amazonaws.com/dev/resource/driver/get-available-for-react",
+    {
+      method: "POST",
+      headers: {
+       "Accept": "application/json",
+       "Content-Type": "application/json"
+      },
+     body: JSON.stringify(data)
+   }
+  );
+  console.log(data);
+  this.setState({
+    listCarAroundResponse:response._bodyInit
+  })
+  let obj = JSON.parse(this.state.listCarAroundResponse);
+  
+   if (response.status >= 200 && response.status < 300) {
+    
+      this.setState({
+        markers: []
+      })
+      
+      if(obj.data.length>0){
+        for(i = 0;i<obj.data.length;i++){
+          // var ob = {"latitude": obj.data[i].latitudeDes, "longitude": obj.data[i].longitudeDes};
+          console.log(obj.data[i].latitudeDes);
+          this.setState({
+            // dataBike:{latitude: obj.data[i].latitudeDes, longitude: obj.data[i].longitudeDes},
+            markers: [
+              ...this.state.markers,
+              {
+                coordinate:{latitude: parseFloat(obj.data[i].latitudeDes), longitude: parseFloat(obj.data[i].longitudeDes)},
+                // cost: `$${getRandomInt(50, 300)}`
+              }
+            ]
+          })
+        }
+      }
+      
+      
+   }
+ } catch (errors) {
+
+   alert(errors);
+  } 
+}
+
 async onPostRecordKinesis(){
   var kinesis = new AWS.Kinesis();
   kinesis.putRecord({
@@ -683,20 +813,20 @@ async onPostRecordKinesis(){
 });
 }
 
-async getListCarAround(){
+// async getListCarAround(){
 
-  fetch('https://facebook.github.io/react-native/movies.json', {method: "GET"})
-   .then((response) => response.json())
-   .then((responseData) =>
-   {
-     //set your data here
-      console.log(responseData);
-   })
-   .catch((error) => {
-       console.error(error);
-   });
+//   fetch('https://facebook.github.io/react-native/movies.json', {method: "GET"})
+//    .then((response) => response.json())
+//    .then((responseData) =>
+//    {
+//      //set your data here
+//       console.log(responseData);
+//    })
+//    .catch((error) => {
+//        console.error(error);
+//    });
  
- }
+//  }
 }
 
 onPress = () => {
@@ -739,15 +869,13 @@ const styles = StyleSheet.create({
   fontWeight: 'bold',
   fontSize: 18,
   color: 'white',
-},baseText: {
+},baseTextMarker: {
   fontFamily: 'Cochin',
     alignItems: 'center',
     borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 0,
     textAlign: 'center',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 6,
     padding:5,
     flex:1,
     color: 'white',
@@ -755,5 +883,10 @@ const styles = StyleSheet.create({
     backgroundColor:"#550bbc",
     padding:5,
     borderRadius:5,
+},geocode:{
+  backgroundColor:"#000",
+  padding:5,
+  borderRadius:5,
+  opacity: .3,
 },
 });
